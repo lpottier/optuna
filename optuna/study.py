@@ -37,16 +37,22 @@ ObjectiveFuncType = Callable[[trial_module.Trial], Union[float, Sequence[float]]
 
 _logger = logging.get_logger(__name__)
 
-import os
+from os import path
 import time
 import inspect
 myself = lambda: str(inspect.stack()[1][3])
 
 class BaseStudy(object):
-    def __init__(self, study_id: int, storage: storages.BaseStorage) -> None:
+    def __init__(self, study_id: int, storage: storages.BaseStorage, log_db: str
+) -> None:
 
         self._study_id = study_id
         self._storage = storage
+        self._log_db = log_db
+
+        if not path.exists(self._log_db) or not path.isfile(self._log_db):
+            _logger.warning("File {} does not exist and/or is not a file. DB I/O log will be outputted on stderr".format(self._log_db))
+            self._log_db = None
 
     @property
     def best_params(self) -> Dict[str, Any]:
@@ -101,14 +107,14 @@ class BaseStudy(object):
 
         te = time.time_ns()
 
-        DBLOGPATH = os.getenv('DBLOGPATH')
+        # DBLOGPATH = os.getenv('DBLOGPATH')
 
         study_name = self._storage.get_study_name_from_id(self._study_id)
 
-        if DBLOGPATH is None:
+        if self._log_db is None:
             _logger.info('%r:%r:%r:%f sec' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
         else:
-            with open(DBLOGPATH, "a") as f:
+            with open(self._log_db, "a") as f:
                 f.write('%r:%r:%r:%f sec\n' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
 
         return x
@@ -227,14 +233,14 @@ class BaseStudy(object):
 
         te = time.time_ns()
 
-        DBLOGPATH = os.getenv('DBLOGPATH')
+        # DBLOGPATH = os.getenv('DBLOGPATH')
 
         study_name = self._storage.get_study_name_from_id(self._study_id)
 
-        if DBLOGPATH is None:
+        if self._log_db is None:
             _logger.info('%r:%r:%r:%f sec' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
         else:
-            with open(DBLOGPATH, "a") as f:
+            with open(self._log_db, "a") as f:
                 f.write('%r:%r:%r:%f sec\n' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
 
         return x
@@ -258,12 +264,13 @@ class Study(BaseStudy):
         storage: Union[str, storages.BaseStorage],
         sampler: Optional["samplers.BaseSampler"] = None,
         pruner: Optional[pruners.BasePruner] = None,
+        log_db: str,
     ) -> None:
 
         self.study_name = study_name
         storage = storages.get_storage(storage)
         study_id = storage.get_study_id_from_name(study_name)
-        super(Study, self).__init__(study_id, storage)
+        super(Study, self).__init__(study_id, storage, log_db)
 
         self.sampler = sampler or samplers.TPESampler()
         self.pruner = pruner or pruners.MedianPruner()
@@ -459,14 +466,14 @@ class Study(BaseStudy):
 
         te = time.time_ns()
 
-        DBLOGPATH = os.getenv('DBLOGPATH')
+        # DBLOGPATH = os.getenv('DBLOGPATH')
 
         study_name = self._storage.get_study_name_from_id(self._study_id)
 
-        if DBLOGPATH is None:
+        if self._log_db is None:
             _logger.info('%r:%r:%r:%f sec' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
         else:
-            with open(DBLOGPATH, "a") as f:
+            with open(self._log_db, "a") as f:
                 f.write('%r:%r:%r:%f sec\n' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
 
         return trial_module.Trial(self, trial_id)
