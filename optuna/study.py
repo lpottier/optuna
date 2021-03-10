@@ -122,16 +122,15 @@ class BaseStudy(object):
 
         te = time.time()
 
-        # logging.debug('%r:%r:%2.2f sec' % ("DB", method.__name__, te-ts))
         DBLOGPATH = os.getenv('DBLOGPATH')
 
-        if DBLOGPATH is None:
-            PATH = os.getcwd()+"/db-log.txt"
+        study_name = self._storage.get_study_name_from_id(self._study_id)
 
-        print("DB log written in {}".format(DBLOGPATH))
+        if DBLOGPATH is None:
+            logging.info('%r:%r:%r:%2.2f sec' % ("DB", study_name, "best_trial", te-ts))
 
         with open(DBLOGPATH, "a") as f:
-            f.write('%r:%r:%2.2f sec' % ("DB", "best_trial", te-ts))
+            f.write('%r:%r:%r:%2.2f sec' % ("DB", study_name, "best_trial", te-ts))
 
         return x
 
@@ -241,8 +240,25 @@ class BaseStudy(object):
             A list of :class:`~optuna.FrozenTrial` objects.
         """
 
+        ts = time.time()
+
         self._storage.read_trials_from_remote_storage(self._study_id)
-        return self._storage.get_all_trials(self._study_id, deepcopy=deepcopy, states=states)
+
+        x = self._storage.get_all_trials(self._study_id, deepcopy=deepcopy, states=states)
+
+        te = time.time()
+
+        DBLOGPATH = os.getenv('DBLOGPATH')
+
+        study_name = self._storage.get_study_name_from_id(self._study_id)
+
+        if DBLOGPATH is None:
+            logging.info('%r:%r:%r:%2.2f sec' % ("DB", study_name, "get_trials", te-ts))
+
+        with open(DBLOGPATH, "a") as f:
+            f.write('%r:%r:%r:%2.2f sec' % ("DB", study_name, "get_trials", te-ts))
+
+        return x
 
 
 class Study(BaseStudy):
