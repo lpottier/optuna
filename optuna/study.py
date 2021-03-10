@@ -127,7 +127,7 @@ class BaseStudy(object):
         study_name = self._storage.get_study_name_from_id(self._study_id)
 
         if DBLOGPATH is None:
-            logging.info('%r:%r:%r:%2.2f sec' % ("DB", study_name, "best_trial", te-ts))
+            _logger.info('%r:%r:%r:%2.2f sec' % ("DB", study_name, "best_trial", te-ts))
 
         with open(DBLOGPATH, "a") as f:
             f.write('%r:%r:%r:%2.2f sec' % ("DB", study_name, "best_trial", te-ts))
@@ -253,7 +253,7 @@ class BaseStudy(object):
         study_name = self._storage.get_study_name_from_id(self._study_id)
 
         if DBLOGPATH is None:
-            logging.info('%r:%r:%r:%2.2f sec' % ("DB", study_name, "get_trials", te-ts))
+            _logger.info('%r:%r:%r:%2.2f sec' % ("DB", study_name, "get_trials", te-ts))
 
         with open(DBLOGPATH, "a") as f:
             f.write('%r:%r:%r:%2.2f sec' % ("DB", study_name, "get_trials", te-ts))
