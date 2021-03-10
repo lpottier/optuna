@@ -37,6 +37,30 @@ ObjectiveFuncType = Callable[[trial_module.Trial], Union[float, Sequence[float]]
 
 _logger = logging.get_logger(__name__)
 
+import os
+from functools import wraps
+
+def logtime(method):
+    @wraps(method)
+    def timed(*args, **kw):
+        ts = time.time()
+        method(*args, **kw)
+        te = time.time()
+
+        # logging.debug('%r:%r:%2.2f sec' % ("DB", method.__name__, te-ts))
+        DBLOGPATH = os.getenv('DBLOGPATH')
+
+        if DBLOGPATH is None:
+            PATH = os.getcwd()+"/db-log.txt"
+
+        print("DB log written in {}".format(DBLOGPATH))
+
+        with open(DBLOGPATH, "a") as f:
+            f.write('%r:%r:%2.2f sec' % ("DB", method.__name__, te-ts))
+
+        return timed
+
+    return logtime
 
 class BaseStudy(object):
     def __init__(self, study_id: int, storage: storages.BaseStorage) -> None:
@@ -75,6 +99,7 @@ class BaseStudy(object):
 
         return best_value
 
+    @logtime
     @property
     def best_trial(self) -> FrozenTrial:
         """Return the best trial in the study.
