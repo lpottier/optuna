@@ -972,6 +972,7 @@ class RDBStorage(BaseStorage):
 
         return copy.deepcopy(trials) if deepcopy else trials
 
+    @timeit(prefix"DB")
     def _get_trials(
         self,
         study_id: int,
@@ -1073,6 +1074,7 @@ class RDBStorage(BaseStorage):
             trial_id=trial.trial_id,
         )
 
+    @timeit(prefix"DB")
     def get_best_trial(self, study_id: int) -> FrozenTrial:
 
         with _create_scoped_session(self.scoped_session) as session:
