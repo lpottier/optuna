@@ -448,12 +448,27 @@ class Study(BaseStudy):
             A :class:`~optuna.trial.Trial`.
         """
 
+        ts = time.time_ns()
+
         # Sync storage once every trial.
         self._storage.read_trials_from_remote_storage(self._study_id)
 
         trial_id = self._pop_waiting_trial_id()
         if trial_id is None:
             trial_id = self._storage.create_new_trial(self._study_id)
+
+        te = time.time_ns()
+
+        DBLOGPATH = os.getenv('DBLOGPATH')
+
+        study_name = self._storage.get_study_name_from_id(self._study_id)
+
+        if DBLOGPATH is None:
+            _logger.info('%r:%r:%r:%f sec' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
+        else:
+            with open(DBLOGPATH, "a") as f:
+                f.write('%r:%r:%r:%f sec\n' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
+
         return trial_module.Trial(self, trial_id)
 
     def tell(
