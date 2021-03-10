@@ -38,29 +38,30 @@ ObjectiveFuncType = Callable[[trial_module.Trial], Union[float, Sequence[float]]
 _logger = logging.get_logger(__name__)
 
 import os
-from functools import wraps
+import time
+# from functools import wraps
 
-def logtime(method):
-    @wraps(method)
-    def timed(*args, **kw):
-        ts = time.time()
-        method(*args, **kw)
-        te = time.time()
+# def logtime(method):
+#     @wraps(method)
+#     def timed(*args, **kw):
+#         ts = time.time()
+#         method(*args, **kw)
+#         te = time.time()
 
-        # logging.debug('%r:%r:%2.2f sec' % ("DB", method.__name__, te-ts))
-        DBLOGPATH = os.getenv('DBLOGPATH')
+#         # logging.debug('%r:%r:%2.2f sec' % ("DB", method.__name__, te-ts))
+#         DBLOGPATH = os.getenv('DBLOGPATH')
 
-        if DBLOGPATH is None:
-            PATH = os.getcwd()+"/db-log.txt"
+#         if DBLOGPATH is None:
+#             PATH = os.getcwd()+"/db-log.txt"
 
-        print("DB log written in {}".format(DBLOGPATH))
+#         print("DB log written in {}".format(DBLOGPATH))
 
-        with open(DBLOGPATH, "a") as f:
-            f.write('%r:%r:%2.2f sec' % ("DB", method.__name__, te-ts))
+#         with open(DBLOGPATH, "a") as f:
+#             f.write('%r:%r:%2.2f sec' % ("DB", method.__name__, te-ts))
 
-        return timed
+#         return timed
 
-    return logtime
+#     return logtime
 
 class BaseStudy(object):
     def __init__(self, study_id: int, storage: storages.BaseStorage) -> None:
@@ -99,7 +100,6 @@ class BaseStudy(object):
 
         return best_value
 
-    @logtime
     @property
     def best_trial(self) -> FrozenTrial:
         """Return the best trial in the study.
@@ -111,13 +111,29 @@ class BaseStudy(object):
             :exc:`RuntimeError`:
                 If the study has more than one direction.
         """
+        ts = time.time()
 
         if self._is_multi_objective():
             raise RuntimeError(
                 "The best trial of a `study` is only supported for single-objective optimization."
             )
 
-        return copy.deepcopy(self._storage.get_best_trial(self._study_id))
+        x = copy.deepcopy(self._storage.get_best_trial(self._study_id))
+
+        te = time.time()
+
+        # logging.debug('%r:%r:%2.2f sec' % ("DB", method.__name__, te-ts))
+        DBLOGPATH = os.getenv('DBLOGPATH')
+
+        if DBLOGPATH is None:
+            PATH = os.getcwd()+"/db-log.txt"
+
+        print("DB log written in {}".format(DBLOGPATH))
+
+        with open(DBLOGPATH, "a") as f:
+            f.write('%r:%r:%2.2f sec' % ("DB", "best_trial", te-ts))
+
+        return x
 
     @property
     def best_trials(self) -> List[FrozenTrial]:
