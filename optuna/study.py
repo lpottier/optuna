@@ -112,10 +112,10 @@ class BaseStudy(object):
         study_name = self._storage.get_study_name_from_id(self._study_id)
 
         if self._log_db is None:
-            _logger.info('%r:%r:%r:%f sec' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
+            _logger.info('%r %r %r %f sec' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
         else:
             with open(self._log_db, "a") as f:
-                f.write('%r:%r:%r:%f sec\n' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
+                f.write('%r,%r,%r,%f\n' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
 
         return x
 
@@ -238,10 +238,10 @@ class BaseStudy(object):
         study_name = self._storage.get_study_name_from_id(self._study_id)
 
         if self._log_db is None:
-            _logger.info('%r:%r:%r:%f sec' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
+            _logger.info('%r %r %r %f sec' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
         else:
             with open(self._log_db, "a") as f:
-                f.write('%r:%r:%r:%f sec\n' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
+                f.write('%r,%r,%r,%f\n' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
 
         return x
 
@@ -471,10 +471,10 @@ class Study(BaseStudy):
         study_name = self._storage.get_study_name_from_id(self._study_id)
 
         if self._log_db is None:
-            _logger.info('%r:%r:%r:%f sec' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
+            _logger.info('%r %r %r %f sec' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
         else:
             with open(self._log_db, "a") as f:
-                f.write('%r:%r:%r:%f sec\n' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
+                f.write('%r,%r,%r,%f\n' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
 
         return trial_module.Trial(self, trial_id)
 
