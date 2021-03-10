@@ -128,9 +128,9 @@ class BaseStudy(object):
 
         if DBLOGPATH is None:
             _logger.info('%r:%r:%r:%2.2f sec' % ("DB", study_name, "best_trial", te-ts))
-
-        with open(DBLOGPATH, "a") as f:
-            f.write('%r:%r:%r:%2.2f sec' % ("DB", study_name, "best_trial", te-ts))
+        else:
+            with open(DBLOGPATH, "a") as f:
+                f.write('%r:%r:%r:%2.2f sec' % ("DB", study_name, "best_trial", te-ts))
 
         return x
 
@@ -254,9 +254,9 @@ class BaseStudy(object):
 
         if DBLOGPATH is None:
             _logger.info('%r:%r:%r:%2.2f sec' % ("DB", study_name, "get_trials", te-ts))
-
-        with open(DBLOGPATH, "a") as f:
-            f.write('%r:%r:%r:%2.2f sec' % ("DB", study_name, "get_trials", te-ts))
+        else:
+            with open(DBLOGPATH, "a") as f:
+                f.write('%r:%r:%r:%2.2f sec' % ("DB", study_name, "get_trials", te-ts))
 
         return x
 
