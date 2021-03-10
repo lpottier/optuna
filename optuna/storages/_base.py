@@ -19,17 +19,16 @@ from optuna.trial import TrialState
 
 DEFAULT_STUDY_NAME_PREFIX = "no-name-"
 
-def logtime(prefix="DEFAULT"):
-    def timeit(method):
-        @wraps(method)
-        def timed(*args, **kw):
-            ts = time.time()
-            result = method(*args, **kw)
-            te = time.time()
+def logtime(method):
+    @wraps(method)
+    def timed(*args, **kw):
+        ts = time.time()
+        method(*args, **kw)
+        te = time.time()
 
-            logging.debug('%r:%r:%2.2f sec' % (prefix, method.__name__, te-ts))
-            return result
+        logging.debug('%r:%r:%2.2f sec' % ("DB", method.__name__, te-ts))
         return timed
+    return logtime
 
 class BaseStorage(object, metaclass=abc.ABCMeta):
     """Base class for storages.
