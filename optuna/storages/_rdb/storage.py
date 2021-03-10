@@ -32,7 +32,7 @@ from optuna import distributions
 from optuna import version
 from optuna._study_direction import StudyDirection
 from optuna._study_summary import StudySummary
-from optuna.storages._base import BaseStorage
+from optuna.storages._base import BaseStorage, timeit
 from optuna.storages._base import DEFAULT_STUDY_NAME_PREFIX
 from optuna.storages._rdb import models
 from optuna.trial import FrozenTrial
@@ -1090,6 +1090,7 @@ class RDBStorage(BaseStorage):
 
         return self.get_trial(trial.trial_id)
 
+    @timeit(prefix"DB")
     def read_trials_from_remote_storage(self, study_id: int) -> None:
         # Make sure that the given study exists.
         with _create_scoped_session(self.scoped_session) as session:
@@ -1272,7 +1273,7 @@ class _VersionManager(object):
 
         message = (
             "The runtime optuna version {} is no longer compatible with the table schema "
-            "(set up by optuna {}). ".format(version.__version__, version_info.library_version)
+            "(set up by optuna {}). ".format(version.__version__, current_version)
         )
         known_versions = self.get_all_versions()
         if current_version in known_versions:
