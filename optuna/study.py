@@ -109,7 +109,7 @@ class BaseStudy(object):
             _logger.info('%r:%r:%r:%f sec' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
         else:
             with open(DBLOGPATH, "a") as f:
-                f.write('%r:%r:%r:%f sec' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
+                f.write('%r:%r:%r:%f sec\n' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
 
         return x
 
@@ -235,7 +235,7 @@ class BaseStudy(object):
             _logger.info('%r:%r:%r:%f sec' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
         else:
             with open(DBLOGPATH, "a") as f:
-                f.write('%r:%r:%r:%f sec' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
+                f.write('%r:%r:%r:%f sec\n' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
 
         return x
 
