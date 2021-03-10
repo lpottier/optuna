@@ -43,7 +43,7 @@ import inspect
 myself = lambda: str(inspect.stack()[1][3])
 
 class BaseStudy(object):
-    def __init__(self, study_id: int, storage: storages.BaseStorage, log_db: str
+    def __init__(self, study_id: int, storage: storages.BaseStorage, log_db: Optional[str] = None
 ) -> None:
 
         self._study_id = study_id
@@ -264,7 +264,7 @@ class Study(BaseStudy):
         storage: Union[str, storages.BaseStorage],
         sampler: Optional["samplers.BaseSampler"] = None,
         pruner: Optional[pruners.BasePruner] = None,
-        log_db: str,
+        log_db: Optional[str] = None,
     ) -> None:
 
         self.study_name = study_name
@@ -1141,6 +1141,7 @@ def load_study(
     storage: Union[str, storages.BaseStorage],
     sampler: Optional["samplers.BaseSampler"] = None,
     pruner: Optional[pruners.BasePruner] = None,
+    log_db: Optional[str] = None,
 ) -> Study:
     """Load the existing :class:`~optuna.study.Study` that has the specified name.
 
@@ -1193,7 +1194,7 @@ def load_study(
 
     """
 
-    return Study(study_name=study_name, storage=storage, sampler=sampler, pruner=pruner)
+    return Study(study_name=study_name, storage=storage, sampler=sampler, pruner=pruner, log_db=log_db)
 
 
 def delete_study(
