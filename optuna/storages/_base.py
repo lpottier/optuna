@@ -1,5 +1,6 @@
 import abc
 import time
+import os
 from functools import wraps
 from typing import Any
 from typing import cast
@@ -26,8 +27,17 @@ def logtime(method):
         method(*args, **kw)
         te = time.time()
 
-        logging.debug('%r:%r:%2.2f sec' % ("DB", method.__name__, te-ts))
+        # logging.debug('%r:%r:%2.2f sec' % ("DB", method.__name__, te-ts))
+        DBLOGPATH = os.getenv('DBLOGPATH')
+
+        if DBLOGPATH is None:
+            PATH = os.getcwd()
+
+        with open(DBLOGPATH, "a") as f:
+            f.write('%r:%r:%2.2f sec' % ("DB", method.__name__, te-ts))
+
         return timed
+
     return logtime
 
 class BaseStorage(object, metaclass=abc.ABCMeta):
