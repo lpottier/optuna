@@ -50,8 +50,8 @@ class BaseStudy(object):
         self._storage = storage
         self._log_db = log_db
 
-        if not path.exists(self._log_db) or not path.isfile(self._log_db):
-            _logger.warning("File {} does not exist and/or is not a file. DB I/O log will be outputted on stderr".format(self._log_db))
+        if path.exists(self._log_db):
+            _logger.warning("File {} already exist. DB I/O log will be outputted on stderr".format(self._log_db))
             self._log_db = None
 
     @property
