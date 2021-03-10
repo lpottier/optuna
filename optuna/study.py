@@ -39,29 +39,8 @@ _logger = logging.get_logger(__name__)
 
 import os
 import time
-# from functools import wraps
-
-# def logtime(method):
-#     @wraps(method)
-#     def timed(*args, **kw):
-#         ts = time.time()
-#         method(*args, **kw)
-#         te = time.time()
-
-#         # logging.debug('%r:%r:%2.2f sec' % ("DB", method.__name__, te-ts))
-#         DBLOGPATH = os.getenv('DBLOGPATH')
-
-#         if DBLOGPATH is None:
-#             PATH = os.getcwd()+"/db-log.txt"
-
-#         print("DB log written in {}".format(DBLOGPATH))
-
-#         with open(DBLOGPATH, "a") as f:
-#             f.write('%r:%r:%2.2f sec' % ("DB", method.__name__, te-ts))
-
-#         return timed
-
-#     return logtime
+import inspect
+myself = lambda: str(inspect.stack()[1][3])
 
 class BaseStudy(object):
     def __init__(self, study_id: int, storage: storages.BaseStorage) -> None:
@@ -111,7 +90,7 @@ class BaseStudy(object):
             :exc:`RuntimeError`:
                 If the study has more than one direction.
         """
-        ts = time.time()
+        ts = time.time_ns()
 
         if self._is_multi_objective():
             raise RuntimeError(
@@ -120,17 +99,17 @@ class BaseStudy(object):
 
         x = copy.deepcopy(self._storage.get_best_trial(self._study_id))
 
-        te = time.time()
+        te = time.time_ns()
 
         DBLOGPATH = os.getenv('DBLOGPATH')
 
         study_name = self._storage.get_study_name_from_id(self._study_id)
 
         if DBLOGPATH is None:
-            _logger.info('%r:%r:%r:%2.2f sec' % ("DB", study_name, "best_trial", te-ts))
+            _logger.info('%r:%r:%r:%f sec' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
         else:
             with open(DBLOGPATH, "a") as f:
-                f.write('%r:%r:%r:%2.2f sec' % ("DB", study_name, "best_trial", te-ts))
+                f.write('%r:%r:%r:%f sec' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
 
         return x
 
@@ -240,23 +219,23 @@ class BaseStudy(object):
             A list of :class:`~optuna.FrozenTrial` objects.
         """
 
-        ts = time.time()
+        ts = time.time_ns()
 
         self._storage.read_trials_from_remote_storage(self._study_id)
 
         x = self._storage.get_all_trials(self._study_id, deepcopy=deepcopy, states=states)
 
-        te = time.time()
+        te = time.time_ns()
 
         DBLOGPATH = os.getenv('DBLOGPATH')
 
         study_name = self._storage.get_study_name_from_id(self._study_id)
 
         if DBLOGPATH is None:
-            _logger.info('%r:%r:%r:%2.2f sec' % ("DB", study_name, "get_trials", te-ts))
+            _logger.info('%r:%r:%r:%f sec' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
         else:
             with open(DBLOGPATH, "a") as f:
-                f.write('%r:%r:%r:%2.2f sec' % ("DB", study_name, "get_trials", te-ts))
+                f.write('%r:%r:%r:%f sec' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
 
         return x
 
