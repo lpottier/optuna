@@ -32,7 +32,7 @@ from optuna import distributions
 from optuna import version
 from optuna._study_direction import StudyDirection
 from optuna._study_summary import StudySummary
-from optuna.storages._base import BaseStorage, logtime
+from optuna.storages._base import BaseStorage
 from optuna.storages._base import DEFAULT_STUDY_NAME_PREFIX
 from optuna.storages._rdb import models
 from optuna.trial import FrozenTrial
@@ -972,7 +972,6 @@ class RDBStorage(BaseStorage):
 
         return copy.deepcopy(trials) if deepcopy else trials
 
-    @logtime
     def _get_trials(
         self,
         study_id: int,
@@ -1074,7 +1073,6 @@ class RDBStorage(BaseStorage):
             trial_id=trial.trial_id,
         )
 
-    @logtime
     def get_best_trial(self, study_id: int) -> FrozenTrial:
 
         with _create_scoped_session(self.scoped_session) as session:
@@ -1092,7 +1090,6 @@ class RDBStorage(BaseStorage):
 
         return self.get_trial(trial.trial_id)
 
-    @logtime
     def read_trials_from_remote_storage(self, study_id: int) -> None:
         # Make sure that the given study exists.
         with _create_scoped_session(self.scoped_session) as session:

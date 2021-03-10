@@ -1,7 +1,4 @@
 import abc
-import time
-import os
-from functools import wraps
 from typing import Any
 from typing import cast
 from typing import Dict
@@ -19,28 +16,6 @@ from optuna.trial import TrialState
 
 
 DEFAULT_STUDY_NAME_PREFIX = "no-name-"
-
-def logtime(method):
-    @wraps(method)
-    def timed(*args, **kw):
-        ts = time.time()
-        method(*args, **kw)
-        te = time.time()
-
-        # logging.debug('%r:%r:%2.2f sec' % ("DB", method.__name__, te-ts))
-        DBLOGPATH = os.getenv('DBLOGPATH')
-
-        if DBLOGPATH is None:
-            PATH = os.getcwd()+"/db-log.txt"
-
-        print("DB log written in {}".format(DBLOGPATH))
-
-        with open(DBLOGPATH, "a") as f:
-            f.write('%r:%r:%2.2f sec' % ("DB", method.__name__, te-ts))
-
-        return timed
-
-    return logtime
 
 class BaseStorage(object, metaclass=abc.ABCMeta):
     """Base class for storages.

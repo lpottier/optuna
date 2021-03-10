@@ -34,6 +34,31 @@ from optuna.trial import TrialState
 _logger = logging.get_logger(__name__)
 
 
+import os
+from functools import wraps
+
+def logtime(method):
+    @wraps(method)
+    def timed(*args, **kw):
+        ts = time.time()
+        method(*args, **kw)
+        te = time.time()
+
+        # logging.debug('%r:%r:%2.2f sec' % ("DB", method.__name__, te-ts))
+        DBLOGPATH = os.getenv('DBLOGPATH')
+
+        if DBLOGPATH is None:
+            PATH = os.getcwd()+"/db-log.txt"
+
+        print("DB log written in {}".format(DBLOGPATH))
+
+        with open(DBLOGPATH, "a") as f:
+            f.write('%r:%r:%2.2f sec' % ("DB", method.__name__, te-ts))
+
+        return timed
+
+    return logtime
+
 def _optimize(
     study: "optuna.Study",
     func: "optuna.study.ObjectiveFuncType",
@@ -324,6 +349,7 @@ def _check_single_value(
     return value, failure_message
 
 
+@logtime
 def _record_heartbeat(trial_id: int, storage: storages.BaseStorage, stop_event: Event) -> None:
     heartbeat_interval = storage.get_heartbeat_interval()
     assert heartbeat_interval is not None
