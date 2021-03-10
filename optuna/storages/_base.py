@@ -31,7 +31,9 @@ def logtime(method):
         DBLOGPATH = os.getenv('DBLOGPATH')
 
         if DBLOGPATH is None:
-            PATH = os.getcwd()
+            PATH = os.getcwd()+"/db-log.txt"
+
+        print("DB log written in {}".format(DBLOGPATH))
 
         with open(DBLOGPATH, "a") as f:
             f.write('%r:%r:%2.2f sec' % ("DB", method.__name__, te-ts))
