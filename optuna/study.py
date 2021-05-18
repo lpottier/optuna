@@ -49,9 +49,8 @@ class BaseStudy(object):
         self._storage = storage
         self._log_db = log_db
 
-        if path.exists(self._log_db):
+        if log_db is not None and path.exists(self._log_db):
             _logger.warning("File {} already exist. DB I/O log will be outputted on stderr".format(self._log_db))
-            self._log_db = None
 
     @property
     def best_params(self) -> Dict[str, Any]:
