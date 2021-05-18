@@ -59,8 +59,20 @@ class BaseStudy(object):
             :exc:`RuntimeError`:
                 If the study has more than one direction.
         """
+        ts = time.time_ns()
 
-        return self.best_trial.params
+        x = self.best_trial.params
+
+        te = time.time_ns()
+
+        study_name = self._storage.get_study_name_from_id(self._study_id)
+
+        if self._log_db is None:
+            _logger.info('%r %r %r %f sec' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
+        else:
+            with open(self._log_db, "a") as f:
+                f.write('%r,%r,%r,%f\n' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
+        return x
 
     @property
     def best_value(self) -> float:
@@ -97,15 +109,19 @@ class BaseStudy(object):
                 "A single best trial cannot be retrieved from a multi-objective study. Consider "
                 "using Study.best_trials to retrieve a list containing the best trials."
             )
-	x = copy.deepcopy(self._storage.get_best_trial(self._study_id))
- 	te = time.time_ns()
- 	study_name = self._storage.get_study_name_from_id(self._study_id)
- 	if self._log_db is None:
- 		_logger.info('%r %r %r %f sec' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
- 	else:
- 		with open(self._log_db, "a") as f:
- 			f.write('%r,%r,%r,%f\n' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
-	return x
+
+        x = copy.deepcopy(self._storage.get_best_trial(self._study_id))
+
+        te = time.time_ns()
+
+        study_name = self._storage.get_study_name_from_id(self._study_id)
+
+        if self._log_db is None:
+            _logger.info('%r %r %r %f sec' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
+        else:
+            with open(self._log_db, "a") as f:
+                f.write('%r,%r,%r,%f\n' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
+        return x
 
     @property
     def best_trials(self) -> List[FrozenTrial]:
@@ -119,8 +135,20 @@ class BaseStudy(object):
         Returns:
             A list of :class:`~optuna.trial.FrozenTrial` objects.
         """
+        ts = time.time_ns()
 
-        return _get_pareto_front_trials(self)
+        x = _get_pareto_front_trials(self)
+
+        te = time.time_ns()
+
+        study_name = self._storage.get_study_name_from_id(self._study_id)
+
+        if self._log_db is None:
+            _logger.info('%r %r %r %f sec' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
+        else:
+            with open(self._log_db, "a") as f:
+                f.write('%r,%r,%r,%f\n' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
+        return x
 
     @property
     def direction(self) -> StudyDirection:
@@ -212,10 +240,21 @@ class BaseStudy(object):
         Returns:
             A list of :class:`~optuna.FrozenTrial` objects.
         """
+        ts = time.time_ns()
 
         self._storage.read_trials_from_remote_storage(self._study_id)
-        return self._storage.get_all_trials(self._study_id, deepcopy=deepcopy, states=states)
+        x = self._storage.get_all_trials(self._study_id, deepcopy=deepcopy, states=states)
 
+        te = time.time_ns()
+
+        study_name = self._storage.get_study_name_from_id(self._study_id)
+
+        if self._log_db is None:
+            _logger.info('%r %r %r %f sec' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
+        else:
+            with open(self._log_db, "a") as f:
+                f.write('%r,%r,%r,%f\n' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
+        return x
 
 class Study(BaseStudy):
     """A study corresponds to an optimization task, i.e., a set of trials.
@@ -235,12 +274,13 @@ class Study(BaseStudy):
         storage: Union[str, storages.BaseStorage],
         sampler: Optional["samplers.BaseSampler"] = None,
         pruner: Optional[pruners.BasePruner] = None,
+        log_db: Optional[str] = None,
     ) -> None:
 
         self.study_name = study_name
         storage = storages.get_storage(storage)
         study_id = storage.get_study_id_from_name(study_name)
-        super().__init__(study_id, storage)
+        super().__init__(study_id, storage, log_db)
 
         self.sampler = sampler or samplers.TPESampler()
         self.pruner = pruner or pruners.MedianPruner()
@@ -295,8 +335,20 @@ class Study(BaseStudy):
         Returns:
             A dictionary containing all user attributes.
         """
+        ts = time.time_ns()
 
-        return copy.deepcopy(self._storage.get_study_user_attrs(self._study_id))
+        x = copy.deepcopy(self._storage.get_study_user_attrs(self._study_id))
+
+        te = time.time_ns()
+
+        study_name = self._storage.get_study_name_from_id(self._study_id)
+
+        if self._log_db is None:
+            _logger.info('%r %r %r %f sec' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
+        else:
+            with open(self._log_db, "a") as f:
+                f.write('%r,%r,%r,%f\n' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
+        return x
 
     @property
     def system_attrs(self) -> Dict[str, Any]:
@@ -305,8 +357,20 @@ class Study(BaseStudy):
         Returns:
             A dictionary containing all system attributes.
         """
+        ts = time.time_ns()
 
-        return copy.deepcopy(self._storage.get_study_system_attrs(self._study_id))
+        x =copy.deepcopy(self._storage.get_study_system_attrs(self._study_id))
+
+        te = time.time_ns()
+
+        study_name = self._storage.get_study_name_from_id(self._study_id)
+
+        if self._log_db is None:
+            _logger.info('%r %r %r %f sec' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
+        else:
+            with open(self._log_db, "a") as f:
+                f.write('%r,%r,%r,%f\n' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
+        return x
 
     def optimize(
         self,
@@ -469,6 +533,8 @@ class Study(BaseStudy):
 
         fixed_distributions = fixed_distributions or {}
 
+        ts = time.time_ns()
+
         # Sync storage once every trial.
         self._storage.read_trials_from_remote_storage(self._study_id)
 
@@ -476,6 +542,16 @@ class Study(BaseStudy):
         if trial_id is None:
             trial_id = self._storage.create_new_trial(self._study_id)
         trial = trial_module.Trial(self, trial_id)
+
+        te = time.time_ns()
+
+        study_name = self._storage.get_study_name_from_id(self._study_id)
+
+        if self._log_db is None:
+            _logger.info('%r %r %r %f sec' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
+        else:
+            with open(self._log_db, "a") as f:
+                f.write('%r,%r,%r,%f\n' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
 
         for name, param in fixed_distributions.items():
             trial._suggest(name, param)
@@ -1145,6 +1221,7 @@ def load_study(
     storage: Union[str, storages.BaseStorage],
     sampler: Optional["samplers.BaseSampler"] = None,
     pruner: Optional[pruners.BasePruner] = None,
+    log_db: Optional[str] = None,
 ) -> Study:
     """Load the existing :class:`~optuna.study.Study` that has the specified name.
 
@@ -1197,7 +1274,7 @@ def load_study(
 
     """
 
-    return Study(study_name=study_name, storage=storage, sampler=sampler, pruner=pruner)
+    return Study(study_name=study_name, storage=storage, sampler=sampler, pruner=pruner, log_db=log_db)
 
 
 def delete_study(
