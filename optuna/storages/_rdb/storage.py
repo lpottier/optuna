@@ -1313,7 +1313,7 @@ class _VersionManager(object):
 
             message = (
                 "The runtime optuna version {} is no longer compatible with the table schema "
-                "(set up by optuna {}). ".format(version.__version__, version_info.library_version)
+                "(set up by optuna {}). ".format(version.__version__, current_version)
             )
             known_versions = self.get_all_versions()
 

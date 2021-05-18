@@ -38,10 +38,13 @@ ObjectiveFuncType = Callable[[trial_module.Trial], Union[float, Sequence[float]]
 
 _logger = logging.get_logger(__name__)
 
+from os import path
+import time
+import inspect
+myself = lambda: str(inspect.stack()[1][3])
 
 class BaseStudy(object):
-    def __init__(self, study_id: int, storage: storages.BaseStorage) -> None:
-
+    def __init__(self, study_id: int, storage: storages.BaseStorage, log_db: Optional[str] = None) -> None:
         self._study_id = study_id
         self._storage = storage
 
@@ -87,14 +90,22 @@ class BaseStudy(object):
             :exc:`RuntimeError`:
                 If the study has more than one direction.
         """
+        ts = time.time_ns()
 
         if self._is_multi_objective():
             raise RuntimeError(
                 "A single best trial cannot be retrieved from a multi-objective study. Consider "
                 "using Study.best_trials to retrieve a list containing the best trials."
             )
-
-        return copy.deepcopy(self._storage.get_best_trial(self._study_id))
+	x = copy.deepcopy(self._storage.get_best_trial(self._study_id))
+ 	te = time.time_ns()
+ 	study_name = self._storage.get_study_name_from_id(self._study_id)
+ 	if self._log_db is None:
+ 		_logger.info('%r %r %r %f sec' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
+ 	else:
+ 		with open(self._log_db, "a") as f:
+ 			f.write('%r,%r,%r,%f\n' % ("DB", study_name, myself(), (te-ts)/(10 ** 9) ))
+	return x
 
     @property
     def best_trials(self) -> List[FrozenTrial]:
