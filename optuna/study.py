@@ -47,6 +47,11 @@ class BaseStudy(object):
     def __init__(self, study_id: int, storage: storages.BaseStorage, log_db: Optional[str] = None) -> None:
         self._study_id = study_id
         self._storage = storage
+        self._log_db = log_db
+
+        if path.exists(self._log_db):
+            _logger.warning("File {} already exist. DB I/O log will be outputted on stderr".format(self._log_db))
+            self._log_db = None
 
     @property
     def best_params(self) -> Dict[str, Any]:
